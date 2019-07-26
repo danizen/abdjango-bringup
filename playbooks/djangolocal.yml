@@ -1,0 +1,41 @@
+# Whether this is the super AMI or the base AMI, it has in /etc/ansible/roles the ansible roles
+# needed to enable Python 3.6.
+# 
+# The ansible-postgresql-client logic will be integrated with the AMI build process
+# later.  Until such time,  it is available at https://github.com/danizen/ansible-postgresql-client
+#
+# AWS Systems Manager requires an agent.  Installing the agent is discusssed at
+# https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-manual-agent-install.html#agent-install-centos
+#
+---
+- hosts: localhost
+  gather_facts: yes
+  connection: local
+
+  vars:
+    python_install_scl: true
+    python_scl_versions:
+       - ver: "36"
+         devel: true
+
+  roles:
+    - { role: ansible-postgresql-client,                 tags: pgdg }
+    - { role: ansible-python,                            tags: python }
+
+  post_tasks:
+    - name: install more rh-python packages, primarily binary
+      yum:
+         name:
+          - rh-python36-PyYAML
+          - rh-python36-numpy
+          - rh-python36-python-bson
+          - rh-python36-python-coverage
+          - rh-python36-python-markupsafe
+          - rh-python36-python-psycopg2
+          - rh-python36-python-pymongo
+          - rh-python36-python-simplejson
+          - rh-python36-python-sqlalchemy
+          - rh-python36-python-tools
+          - rh-python36-scipy
+         state: latest
+
